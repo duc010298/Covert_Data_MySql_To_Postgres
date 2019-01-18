@@ -9,24 +9,22 @@ import entity.UltraSoundResult;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Main {
 
     private static final int rowOnPage = 100;
 
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
+
+
         System.out.println("========== Convert Data MySQL to Postgres ==========");
         System.out.println("--- Step 1: Enter MySQL connection information");
-        inputConnectInformation();
-        System.out.println();
+        ConnInfo connInfoMysql = inputInfo();
         System.out.println("--- Step 2: Enter Postgres connection information");
-        inputConnectInformation();
-        System.out.println();
+        ConnInfo connInfoPostgres = inputInfo();
         System.out.println("=====================================================");
         DBConnect dbConnect = new DBConnect();
-
-        ConnInfo connInfoPostgres = new ConnInfo("localhost", "5432", "clinic", "postgres", "123456");
-        ConnInfo connInfoMysql = new ConnInfo("localhost", "3306", "clinic", "duc010298", "123456");
 
         System.out.println("-- Step 3: Initialize connection to MySQL");
         Connection connMysql = dbConnect.getConnectionMySql(connInfoMysql);
@@ -60,18 +58,26 @@ public class Main {
         int totalPage = (int) Math.ceil(Double.valueOf(totalCustomer) / Double.valueOf(rowOnPage));
         ArrayList<CustomerMySql> customers;
         int count = 0;
-        for(int i = 1; i <= totalPage; i++) {
+        for (int i = 1; i <= totalPage; i++) {
             customers = customerMySqlDAO.getCustomerByPage(i, rowOnPage);
             count += customerPostgresDAO.insertCustomer(customers);
         }
         System.out.println(count + " records have been inserted");
     }
 
-    private static void inputConnectInformation() {
+    private static ConnInfo inputInfo() {
+        Scanner sc = new Scanner(System.in);
         System.out.print("Host: ");
+        String host = sc.nextLine();
         System.out.print("Port: ");
+        String port = sc.nextLine();
         System.out.print("Database: ");
+        String database = sc.nextLine();
         System.out.print("User: ");
+        String user = sc.nextLine();
         System.out.print("Password: ");
+        String pass = sc.nextLine();
+        ConnInfo connInfo = new ConnInfo(host, port, database, user, pass);
+        return connInfo;
     }
 }
