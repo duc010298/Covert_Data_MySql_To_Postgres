@@ -104,10 +104,10 @@ public class MainServer {
     private CustomerPostgres convertCustomer(CustomerMySql customerMySql) {
         CustomerPostgres customerPostgres = new CustomerPostgres();
         customerPostgres.setCustomerName(customerMySql.getName());
-        customerPostgres.setNameSearch(customerMySql.getNameS());
+        customerPostgres.setNameSearch(customerMySql.getNameS().trim().toLowerCase());
         customerPostgres.setYob(customerMySql.getyOB());
         customerPostgres.setAddress(customerMySql.getAddressCus());
-        customerPostgres.setAddressSearch(customerMySql.getAddressCusS());
+        customerPostgres.setAddressSearch(customerMySql.getAddressCusS().trim().toLowerCase());
         customerPostgres.setDayVisit(convertUtilToSql(customerMySql.getDayVisit()));
         customerPostgres.setExpectedDob(convertUtilToSql(customerMySql.getExpectedDOB()));
         customerPostgres.setResult(customerMySql.getResult());
