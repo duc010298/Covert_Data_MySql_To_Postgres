@@ -30,7 +30,7 @@ public class MainServer {
     private static String serverUrl;
 
     public static void main(String[] args) {
-        MainServer mainServer = new MainServer();
+        final MainServer mainServer = new MainServer();
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setDateFormat("yyyy-MM-dd");
         gson = gsonBuilder.create();
@@ -49,10 +49,10 @@ public class MainServer {
         System.out.print("Password:");
         String pass = sc.nextLine();
 
-        serverUrl = "https://phongkham158.herokuapp.com/";
-//        System.out.println("--- Enter server URL");
-//        System.out.print("URL:");
-//        serverUrl = sc.nextLine();
+//        serverUrl = "https://phongkham158.herokuapp.com/";
+        System.out.println("--- Enter server URL");
+        System.out.print("URL:");
+        serverUrl = sc.nextLine();
 
 
         DBConnect dbConnect = new DBConnect();
@@ -73,22 +73,31 @@ public class MainServer {
         }
 
         System.out.println("--- Get total customer on MySQL");
-        CustomerMySqlDAO customerMySqlDAO = new CustomerMySqlDAO(connMysql);
+        final CustomerMySqlDAO customerMySqlDAO = new CustomerMySqlDAO(connMysql);
         int totalCustomer = customerMySqlDAO.getTotalCustomer();
         System.out.println(totalCustomer + " customer");
         System.out.println("-- Send customer from MySQL to Server");
         int totalPage = (int) Math.ceil(Double.valueOf(totalCustomer) / Double.valueOf(rowOnPage));
-        ArrayList<CustomerMySql> customers;
-        try {
-            for (int i = 1; i <= totalPage; i++) {
-                customers = customerMySqlDAO.getCustomerByPage(i, rowOnPage);
-                for (CustomerMySql cMySql : customers) {
-                    CustomerPostgres customerPostgres = mainServer.convertCustomer(cMySql);
-                    mainServer.sendPostCustomer(customerPostgres);
+        Thread[] threads = new Thread[totalPage];
+
+        for (int i = 1; i <= totalPage; i++) {
+            final int finalI = i;
+            threads[i - 1] = new Thread() {
+                @Override
+                public void run() {
+                    ArrayList<CustomerMySql> customers = customerMySqlDAO.getCustomerByPage(finalI, rowOnPage);
+
+                    try {
+                        for (CustomerMySql cMySql : customers) {
+                            CustomerPostgres customerPostgres = mainServer.convertCustomer(cMySql);
+                            mainServer.sendPostCustomer(customerPostgres);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            };
+            threads[i - 1].start();
         }
     }
 
@@ -108,7 +117,7 @@ public class MainServer {
     }
 
     private java.sql.Date convertUtilToSql(Date uDate) {
-        if(uDate == null) return null;
+        if (uDate == null) return null;
         java.sql.Date sDate = new java.sql.Date(uDate.getTime());
         return sDate;
     }
