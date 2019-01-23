@@ -11,13 +11,11 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Main {
+public class MainLocalhost {
 
     private static final int rowOnPage = 100;
 
     public static void main(String[] args) {
-
-
         System.out.println("========== Convert Data MySQL to Postgres ==========");
         System.out.println("--- Step 1: Enter MySQL connection information");
         ConnInfo connInfoMysql = inputInfo();

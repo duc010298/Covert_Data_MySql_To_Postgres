@@ -18,7 +18,7 @@ public class UltraSoundResultDAO {
     public ArrayList<UltraSoundResult> getAllResult() {
         ArrayList<UltraSoundResult> ultraSoundResults = new ArrayList<>();
 
-        String sql = "select * from UltraSoundResult";
+        String sql = "select * from UltraSoundResult order by OrderNumber";
         try (Statement sta = conn.createStatement()){
             try (ResultSet rs = sta.executeQuery(sql)) {
                 while (rs.next()) {
